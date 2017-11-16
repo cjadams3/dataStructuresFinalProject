@@ -5,12 +5,15 @@ public class songLink {
 	private String albumName;
 	private int playCount;
 	public songLink next;
+	public songLink previous;
 	
 	public songLink(String song, String artist, String album, int count) {
 		this.songTitle = song;
 		this.artist = artist;
 		this.albumName = album;
 		this.playCount = count;
+		this.next = null;
+		this.previous = null;
 	}
 
 	public String getSongTitle() {
