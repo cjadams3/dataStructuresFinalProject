@@ -107,6 +107,8 @@ public class linkedList {
 					}
 					else {
 						previous.next = current.next; // Item is not first item in list, change pointers to remove current item
+						songLink tempNext = current.next;
+						tempNext.previous = previous;
 						songLink temp = current;
 						nElems--;
 						return temp; // Return removed item
@@ -128,10 +130,11 @@ public class linkedList {
 	 * Play method of the linkedList class, plays the song and increments the play count
 	 * @param a
 	 */
-	public void play(songLink a) {
-		int playCount = a.getPlayCount(); // Get play count from songLink getPlayCount() method
+	public void play(String song, String artist) {
+		songLink temp = find(song, artist); // Get songLink item from song title and artist passed in to play() method
+		int playCount = temp.getPlayCount(); // Get play count from songLink getPlayCount() method
 		playCount++;
-		a.setPlayCount(playCount); // Set play count using songLink setPlayCount() method
+		temp.setPlayCount(playCount); // Set play count using songLink setPlayCount() method
 		return;	
 	}
 	/**
@@ -147,7 +150,7 @@ public class linkedList {
 		System.out.println("");
 	}
 	/**
-	 * songSort method of the linkedList class, sorts songLink items based on song title
+	 * songSort method of the linkedList class, sorts songLink items - first by song title, then by artist
 	 */
 	public void songSort() {
 		songLink previous = null;
@@ -159,9 +162,9 @@ public class linkedList {
 					min = link2; // New minimum is found
 				}
 				else if (songCompare == 0) {
-					if (min != link2) {
-						int artistCompare = min.getArtist().compareTo(link2.getArtist());
-						if (artistCompare > 0) min = link2;
+					if (min != link2) { // Two song titles are the same
+						int artistCompare = min.getArtist().compareTo(link2.getArtist()); // Compare by artist if song title is same
+						if (artistCompare > 0) min = link2; // New minimum is found
 					}
 				}
 					
@@ -171,7 +174,87 @@ public class linkedList {
 			link1 = resultArray[1]; // Load new outer loop pointer value
 			previous = resultArray[2]; // Load new previous songLink element value
 		}
-	} 
+	}
+	/**
+	 * artistSort method of the linkedList class. Sorts songLink items - first by artist, then by song title
+	 */
+	public void artistSort() {
+		songLink previous = null;
+		for (songLink link1 = first; link1 != null; link1 = link1.next) { // Outer loop to get element to swap
+			songLink min = link1;
+			for (songLink link2 = link1; link2 != null; link2 = link2.next) { // Inner loop to find swapper element based on artist name
+				int artistCompare = min.getArtist().compareTo(link2.getArtist());
+				if (artistCompare > 0) {
+					min = link2; // new minimum is found
+				}
+				else if (artistCompare == 0) {
+					if (min != link2) { // Two artists are the same
+						int songCompare = min.getSongTitle().compareTo(link2.getSongTitle()); // Compare by song title if artist is the same
+						if (songCompare > 0) min = link2; // New minimum is found
+					}
+				}
+			}
+			songLink resultArray[] = Swap(min, link1, previous); // Call to Swap() method to swap two elements
+			min = resultArray[0]; // Load new minimum value
+			link1 = resultArray[1]; // Load new outer loop pointer value
+			previous = resultArray[2]; // Load new previous songLink element value
+		}
+	}
+	/**
+	 * albumSort() method of the linkedList class, sorts songLink items - first by album name, then by song title
+	 */
+	public void albumSort() {
+		songLink previous = null;
+		for (songLink link1 = first; link1 != null; link1 = link1.next) { // Outer loop to get element to swap
+			songLink min = link1;
+			for (songLink link2 = link1; link2 != null; link2 = link2.next) { // Inner loop to get swapper element based on album title
+				int albumCompare = min.getAlbumName().compareTo(link2.getAlbumName());
+				if (albumCompare > 0) {
+					min = link2; // New minimum found
+				}
+				else if (albumCompare == 0) {
+					if (min != link2) { // Album titles are the same
+						int songCompare = min.getSongTitle().compareTo(link2.getSongTitle()); // Compare by song title if album titles are the same
+						if (songCompare > 0) min = link2; // New minimum element found
+					}
+				}
+			}
+			songLink resultArray[] = Swap(min, link1, previous); // Call to Swap() method to swap two elements
+			min = resultArray[0]; // Load new minimum value
+			link1 = resultArray[1]; // Load new outer loop pointer value
+			previous = resultArray[2]; // Load new previous songLink element value
+		}
+	}
+	/**
+	 * countSort() method of the linkedList class, sorts songLink items - first by play count, then by artist name, then by song title
+	 */
+	public void countSort() {
+		songLink previous = null;
+		for (songLink link1 = first; link1 != null; link1 = link1.next) { // Outer loop to get element to swap
+			songLink min = link1;
+			for (songLink link2 = link1; link2 != null; link2 = link2.next) { // Inner loop to get swapper element based on play count
+				if (min.getPlayCount() > link2.getPlayCount()) {
+					min = link2; // New minimum found
+				}
+				else if (min.getPlayCount() == link2.getPlayCount()) {
+					if (min != link2) { // Play count is equal
+						int artistCompare = min.getArtist().compareTo(link2.getArtist());
+						if (artistCompare > 0) {
+							min = link2; // New minimum is found
+						}
+						else if (artistCompare == 0) { // Play count AND artist name are the same
+							int songCompare = min.getSongTitle().compareTo(link2.getSongTitle());
+							if (songCompare > 0) min = link2; // New minimum is found
+						}
+					}
+				}
+			}
+			songLink resultArray[] = Swap(min, link1, previous); // Call to Swap() method to swap two elements
+			min = resultArray[0]; // Load new minimum value
+			link1 = resultArray[1]; // Load new outer loop pointer value
+			previous = resultArray[2]; // Load new previous songLink element value
+		}
+	}
 	/**
 	 * Swap method of the linkedList class, swaps two elements of a linked List
 	 * @param min
@@ -179,7 +262,7 @@ public class linkedList {
 	 * @param previous
 	 * @return
 	 */
-	public songLink[] Swap(songLink min, songLink link1, songLink previous) {
+	private songLink[] Swap(songLink min, songLink link1, songLink previous) {
 		if (min != link1) { // Is minimum element already in the correct place?
 			if (previous == null) { // Is first element in the list the one to swap?
 				songLink temp = first;
@@ -214,7 +297,7 @@ public class linkedList {
 					link1.previous = min;
 					link1.next = tempNext;
 					oldTempPrev.next = min;
-					oldTempNext.previous = min;
+					oldTempNext.previous = oldTempPrev;
 					if (tempNext != null) tempNext.previous = link1; // Is minimum element last in list?
 				}
 				else { // Elements to swap are not next to each other
@@ -240,7 +323,7 @@ public class linkedList {
 					link1.previous = min;
 					link1.next = tempNext;
 					oldTempPrev.next = min;
-					oldTempNext.previous = min;
+					oldTempNext.previous = oldTempPrev;
 					if (tempNext != null) tempNext.previous = link1; // Is minimum element last in list?
 				}
 				else {
@@ -259,10 +342,41 @@ public class linkedList {
 			}
 		}
 		else { // Minimum element is in the correct position, no need to swap
+			if (previous != null) {
 			previous.next = min;
 			previous = previous.next;
 			link1 = min; // Change outer loop element
 		}
+			else {
+				previous = first;
+				link1 = min;
+			}
+		}
 	return new songLink[] {min, link1, previous}; // Return array with results of the swap
+	}
+	/**
+	 * libarayCount() method of the linkedList class, displays number of elements currently in the music library
+	 */
+	public void libraryCount() {
+		System.out.println("There are " + nElems + " songs currently in the music library");
+		System.out.println("");
+	}
+	/**
+	 * find() method of the linkedList class, receives a song title and artist and passes back the songLink item associated with these properties
+	 * @param song
+	 * @param artist
+	 * @return
+	 */
+	private songLink find(String song, String artist) {
+		for (songLink link1 = first; link1 != null; link1 = link1.next) { // Loop through songLink items until requested item is found
+			int artistCompare = link1.getArtist().compareTo(artist);
+			if (artistCompare == 0) { // Does artist name match the current element
+				int songCompare = link1.getSongTitle().compareTo(song);
+				if (songCompare == 0) { // Does song title match the current element
+					return link1; // Pass back current songLink element
+				}
+			}
+		}
+		return null;
 	}
 }
